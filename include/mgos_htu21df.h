@@ -19,7 +19,7 @@
 #include "mgos.h"
 #include "mgos_i2c.h"
 
-#define MGOS_HTU21DF_READ_DELAY (2)
+#define MGOS_HTU21DF_READ_DELAY    (2)
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,16 +27,16 @@ extern "C" {
 
 struct mgos_htu21df;
 struct mgos_htu21df_stats {
-  double last_read_time;         // value of mg_time() upon last call to _read()
+  double   last_read_time;       // value of mg_time() upon last call to _read()
   uint32_t read;                 // calls to _read()
   uint32_t read_success;         // successful _read()
   uint32_t read_success_cached;  // calls to _read() which were cached
   // Note: read_errors := read - read_success - read_success_cached
-  double read_success_usecs;     // time spent in successful uncached _read()
+  double   read_success_usecs;   // time spent in successful uncached _read()
 };
 
 
-/* 
+/*
  * Initialize a HTU21DF on the I2C bus `i2c` at address specified in `i2caddr`
  * parameter (default HTU21DF is on address 0x40). The sensor will be polled for
  * validity, upon success a new `struct mgos_htu21df` is allocated and
@@ -44,7 +44,7 @@ struct mgos_htu21df_stats {
  */
 struct mgos_htu21df *mgos_htu21df_create(struct mgos_i2c *i2c, uint8_t i2caddr);
 
-/* 
+/*
  * Destroy the data structure associated with a HTU21DF device. The reference
  * to the pointer of the `struct mgos_htu21df` has to be provided, and upon
  * successful destruction, its associated memory will be freed and the pointer
@@ -52,7 +52,7 @@ struct mgos_htu21df *mgos_htu21df_create(struct mgos_i2c *i2c, uint8_t i2caddr);
  */
 void mgos_htu21df_destroy(struct mgos_htu21df **sensor);
 
-/* 
+/*
  * The sensor will be polled for its temperature and humidity data. If the poll
  * has occured in the last `MGOS_HTU21DF_READ_DELAY` seconds, the cached data is
  * used (so as not to repeatedly poll the bus upon subsequent calls).

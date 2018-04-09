@@ -21,13 +21,13 @@
 #include "mgos_htu21df.h"
 #include <math.h>
 
-#define MGOS_HTU21DF_DEFAULT_I2CADDR       (0x40)
+#define MGOS_HTU21DF_DEFAULT_I2CADDR    (0x40)
 
-#define MGOS_HTU21DF_READTEMP              (0xE3)
-#define MGOS_HTU21DF_READHUM               (0xE5)
-#define MGOS_HTU21DF_WRITEREG              (0xE6)
-#define MGOS_HTU21DF_READREG               (0xE7)
-#define MGOS_HTU21DF_RESET                 (0xFE)
+#define MGOS_HTU21DF_READTEMP           (0xE3)
+#define MGOS_HTU21DF_READHUM            (0xE5)
+#define MGOS_HTU21DF_WRITEREG           (0xE6)
+#define MGOS_HTU21DF_READREG            (0xE7)
+#define MGOS_HTU21DF_RESET              (0xFE)
 
 
 #ifdef __cplusplus
@@ -35,11 +35,11 @@ extern "C" {
 #endif
 
 struct mgos_htu21df {
-  struct mgos_i2c *i2c;
-  uint8_t i2caddr;
+  struct mgos_i2c *         i2c;
+  uint8_t                   i2caddr;
   struct mgos_htu21df_stats stats;
 
-  float humidity, temperature;
+  float                     humidity, temperature;
 };
 
 #ifdef __cplusplus

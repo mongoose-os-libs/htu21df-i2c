@@ -23,9 +23,9 @@
 
 // Private functions follow
 static bool mgos_htu21df_cmd(struct mgos_htu21df *sensor, uint8_t cmd) {
-
-  if (!sensor || !sensor->i2c)
+  if (!sensor || !sensor->i2c) {
     return false;
+  }
 
   if (!mgos_i2c_write(sensor->i2c, sensor->i2caddr, &cmd, 1, true)) {
     LOG(LL_ERROR, ("I2C=0x%02x cmd=%u (0x%02x) write error", sensor->i2caddr, cmd, cmd));
@@ -36,16 +36,18 @@ static bool mgos_htu21df_cmd(struct mgos_htu21df *sensor, uint8_t cmd) {
 }
 
 static uint8_t crc8(const uint8_t *data, int len) {
-  const uint8_t poly=0x31;
-  uint8_t crc=0x00;
+  const uint8_t poly = 0x31;
+  uint8_t       crc  = 0x00;
 
-  for (int j=len; j; --j) {
-    crc^=*data++;
-    for (int i=8; i; --i)
-      crc=(crc & 0x80) ? (crc << 1) ^ poly : (crc << 1);
+  for (int j = len; j; --j) {
+    crc ^= *data++;
+    for (int i = 8; i; --i) {
+      crc = (crc & 0x80) ? (crc << 1) ^ poly : (crc << 1);
+    }
   }
   return crc;
 }
+
 // Private functions end
 
 // Public functions follow
@@ -53,13 +55,18 @@ struct mgos_htu21df *mgos_htu21df_create(struct mgos_i2c *i2c, uint8_t i2caddr) 
   struct mgos_htu21df *sensor;
   uint8_t version;
 
-  if (!i2c) return NULL;
+  if (!i2c) {
+    return NULL;
+  }
 
-  sensor=calloc(1, sizeof(struct mgos_htu21df));
-  if (!sensor) return NULL;
+  sensor = calloc(1, sizeof(struct mgos_htu21df));
+  if (!sensor) {
+    return NULL;
+  }
+
   memset(sensor, 0, sizeof(struct mgos_htu21df));
-  sensor->i2caddr=i2caddr;
-  sensor->i2c=i2c;
+  sensor->i2caddr = i2caddr;
+  sensor->i2c     = i2c;
 
   mgos_htu21df_cmd(sensor, MGOS_HTU21DF_RESET);
   mgos_usleep(25000);
@@ -81,17 +88,22 @@ struct mgos_htu21df *mgos_htu21df_create(struct mgos_i2c *i2c, uint8_t i2caddr) 
 }
 
 void mgos_htu21df_destroy(struct mgos_htu21df **sensor) {
-  if (!*sensor) return;
-  free (*sensor);
-  *sensor=NULL;
+  if (!*sensor) {
+    return;
+  }
+
+  free(*sensor);
+  *sensor = NULL;
   return;
 }
 
 bool mgos_htu21df_read(struct mgos_htu21df *sensor) {
   double start = mg_time();
 
-  if (!sensor || !sensor->i2c)
+  if (!sensor || !sensor->i2c) {
     return false;
+  }
+
   sensor->stats.read++;
 
   if (start - sensor->stats.last_read_time < MGOS_HTU21DF_READ_DELAY) {
@@ -99,7 +111,7 @@ bool mgos_htu21df_read(struct mgos_htu21df *sensor) {
     return true;
   }
 
-  // Read out sensor data here 
+  // Read out sensor data here
   //
   uint8_t data[3];
 
@@ -113,13 +125,13 @@ bool mgos_htu21df_read(struct mgos_htu21df *sensor) {
     LOG(LL_ERROR, ("CRC error on temperature data"));
     return false;
   }
- 
-  uint16_t temp = (data[0]<<8)+data[1];
-  float temperature = temp;
-  temperature *= 175.72;
-  temperature /= 65536;
-  temperature -= 46.85;
-  sensor->temperature=temperature;
+
+  uint16_t temp        = (data[0] << 8) + data[1];
+  float    temperature = temp;
+  temperature        *= 175.72;
+  temperature        /= 65536;
+  temperature        -= 46.85;
+  sensor->temperature = temperature;
 
   mgos_htu21df_cmd(sensor, MGOS_HTU21DF_READHUM);
   mgos_usleep(50000);
@@ -131,36 +143,41 @@ bool mgos_htu21df_read(struct mgos_htu21df *sensor) {
     LOG(LL_ERROR, ("CRC error on temperature data"));
     return false;
   }
- 
-  uint16_t hum = (data[0]<<8)+data[1];
-  float humidity = hum;
-  humidity *= 125;
-  humidity /= 65536;
-  humidity -= 6;
-  sensor->humidity=humidity;
+
+  uint16_t hum      = (data[0] << 8) + data[1];
+  float    humidity = hum;
+  humidity        *= 125;
+  humidity        /= 65536;
+  humidity        -= 6;
+  sensor->humidity = humidity;
 
   LOG(LL_DEBUG, ("temperature=%.2fC humidity=%.1f%%", sensor->temperature, sensor->humidity));
   sensor->stats.read_success++;
-  sensor->stats.read_success_usecs+=1000000*(mg_time()-start);
-  sensor->stats.last_read_time=start;
+  sensor->stats.read_success_usecs += 1000000 * (mg_time() - start);
+  sensor->stats.last_read_time      = start;
   return true;
 }
 
 float mgos_htu21df_getTemperature(struct mgos_htu21df *sensor) {
-  if (!mgos_htu21df_read(sensor)) return NAN;
+  if (!mgos_htu21df_read(sensor)) {
+    return NAN;
+  }
 
   return sensor->temperature;
 }
 
 float mgos_htu21df_getHumidity(struct mgos_htu21df *sensor) {
-  if (!mgos_htu21df_read(sensor)) return NAN;
+  if (!mgos_htu21df_read(sensor)) {
+    return NAN;
+  }
 
   return sensor->humidity;
 }
 
 bool mgos_htu21df_getStats(struct mgos_htu21df *sensor, struct mgos_htu21df_stats *stats) {
-  if (!sensor || !stats)
+  if (!sensor || !stats) {
     return false;
+  }
 
   memcpy((void *)stats, (const void *)&sensor->stats, sizeof(struct mgos_htu21df_stats));
   return true;
@@ -169,4 +186,5 @@ bool mgos_htu21df_getStats(struct mgos_htu21df *sensor, struct mgos_htu21df_stat
 bool mgos_htu21df_i2c_init(void) {
   return true;
 }
+
 // Public functions end
